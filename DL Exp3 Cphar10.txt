@@ -1,0 +1,171 @@
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from tensorflow import keras
+from tensorflow.keras.layers import Dense,Conv2D,Flatten,MaxPool2D
+from tensorflow.keras import Sequential
+
+
+
+
+
+#loading cifar10 dataset which is prebuilt in tensorflow
+(xtrain,ytrain),(xtest,ytest) = tf.keras.datasets.cifar10.load_data()
+
+
+
+
+
+#checking for data if it is loaded or not
+plt.imshow(xtrain[0])
+
+
+
+
+
+#checking for the shape of the data
+xtrain.shape,xtest.shape
+
+
+
+
+
+
+
+#normalizing the data which converts data ranging from (0 to 255) -> (0 to 1) 
+xtrain = xtrain/255.0
+xtest = xtest/255.0
+xtrain[0]
+
+
+
+
+
+
+#building the model
+model = Sequential([Conv2D(filters=32,kernel_size=3, padding="same", activation="relu", input_shape=[32,32,3]),
+                   MaxPool2D(pool_size=2,strides=2, padding='valid'),
+                   Flatten(),
+                   Dense(100,activation="relu"),
+                   Dense(10,activation="softmax")])
+
+
+
+
+
+
+
+
+ #model needs to be compiled before it is trained on the dataset
+    model.compile(optimizer="sgd",loss="sparse_categorical_crossentropy",metrics=['accuracy'])
+
+
+
+
+
+
+
+
+
+
+#training the CNN model with 10 epochs
+history = model.fit(xtrain,ytrain,validation_data=(xtest,ytest),epochs=10)
+
+
+
+
+
+
+
+#predicting the test values
+predicted = model.predict(xtest)
+
+
+
+
+
+
+
+
+
+predicted[0]
+
+
+
+
+
+
+
+
+import random
+n = random.randint(0,999)
+
+
+
+
+
+
+
+
+
+
+
+n = random.randint(0,999)
+#creating a list of classes to give particular output
+classes = ["airplane","automobile","bird","cat","deer","dog","frog","horse","ship","truck"]
+
+#getting the index with max value
+value=predicted[n][0]
+index=0
+for i in range(len(predicted[n])):
+    if value<predicted[n][i]:
+        index = i
+
+        
+        
+#showing output by plotting the image and the corresponding output
+plt.imshow(xtest[n])
+plt.xlabel("model predicted it as a :"+classes[index])
+
+
+
+
+
+
+
+
+
+
+
+history.history.keys()
+
+
+
+
+
+
+
+
+
+#plotting accuracy parameters
+plt.plot(history.history['accuracy'],label="train_accuracy")
+plt.plot(history.history['val_accuracy'],label="test_accuracy")
+plt.legend(loc="upper left")
+
+plt.xlabel("Epochs")
+plt.ylabel("Accuracy")
+plt.show()
+
+
+
+
+
+
+
+
+#plotting Loss parameters
+plt.plot(history.history['loss'],label="train_loss")
+plt.plot(history.history['val_loss'],label="test_loss")
+plt.legend(loc="upper right")
+plt.xlabel("Epochs")
+plt.ylabel("loss")
+plt.show()
